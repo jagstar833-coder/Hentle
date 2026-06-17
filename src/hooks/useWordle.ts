@@ -68,7 +68,7 @@ interface SavedState {
 
 function loadSaved(): SavedState | null {
   try {
-    const raw = localStorage.getItem('hentle-state')
+    const raw = sessionStorage.getItem('hentle-state')
     if (!raw) return null
     const parsed = JSON.parse(raw) as SavedState
     if (parsed.date !== todayKey()) return null
@@ -229,7 +229,7 @@ export function useWordle(answer: string) {
       currentRow,
       status: gameStatus,
     }
-    localStorage.setItem('hentle-state', JSON.stringify(state))
+    sessionStorage.setItem('hentle-state', JSON.stringify(state))
   }, [rows, currentRow, gameStatus, answer])
 
   return {
