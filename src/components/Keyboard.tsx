@@ -29,7 +29,7 @@ export default function Keyboard({ keyStates, onKey, onEnter, onDelete }: Keyboa
   }
 
   return (
-    <div className="flex flex-col gap-2 w-full max-w-[580px] mx-auto px-3 pb-6">
+    <div className="flex flex-col gap-1.5 w-full max-w-[580px] mx-auto px-2 pb-4 sm:pb-6">
       {ROWS.map((row, i) => (
         <div key={i} className="flex gap-1.5">
           {row.map(key => {
@@ -41,7 +41,7 @@ export default function Keyboard({ keyStates, onKey, onEnter, onDelete }: Keyboa
                 onClick={() => handleClick(key)}
                 className={`
                   ${isWide ? 'flex-[1.5] text-xs' : 'flex-1'}
-                  h-16 rounded font-bold text-base uppercase
+                  h-14 sm:h-16 rounded font-bold text-sm sm:text-base uppercase
                   transition-colors duration-150 select-none
                   active:scale-95
                   ${keyColor[state]}

@@ -60,7 +60,7 @@ export default function Game() {
 
   const {
     rows, gameStatus, keyStates,
-    toast, shakeRow, bounceRow, revealingRow, checking,
+    toast, shakeRow, bounceRow, revealingRow,
     addLetter, removeLetter, submitGuess,
   } = useWordle(answer)
 
