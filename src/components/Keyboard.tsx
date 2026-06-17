@@ -29,9 +29,9 @@ export default function Keyboard({ keyStates, onKey, onEnter, onDelete }: Keyboa
   }
 
   return (
-    <div className="flex flex-col gap-1.5 w-full max-w-[500px] mx-auto px-2 pb-4">
+    <div className="flex flex-col gap-2 w-full px-2 pb-6">
       {ROWS.map((row, i) => (
-        <div key={i} className="flex justify-center gap-1.5">
+        <div key={i} className="flex gap-1.5">
           {row.map(key => {
             const state = keyStates[key] ?? 'empty'
             const isWide = key === 'ENTER' || key === '⌫'
@@ -40,10 +40,10 @@ export default function Keyboard({ keyStates, onKey, onEnter, onDelete }: Keyboa
                 key={key}
                 onClick={() => handleClick(key)}
                 className={`
-                  ${isWide ? 'px-3 text-xs min-w-[65px]' : 'w-[46px]'}
+                  ${isWide ? 'flex-[1.5] text-xs' : 'flex-1'}
                   h-16 rounded font-bold text-sm uppercase
                   transition-colors duration-150 select-none
-                  active:scale-95 transition-transform
+                  active:scale-95
                   ${keyColor[state]}
                 `}
               >
