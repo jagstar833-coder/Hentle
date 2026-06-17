@@ -87,7 +87,7 @@ export default function Game() {
         gameOver={gameStatus !== 'playing'}
       />
 
-      <Toast message={checking ? 'Checking…' : toast} />
+      <Toast message={toast} />
 
       <Board
         rows={rows}
