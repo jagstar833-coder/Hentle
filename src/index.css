@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dark-100: #818384;
+  --color-dark-200: #565758;
+  --color-dark-300: #3a3a3c;
+  --color-dark-400: #272729;
+  --color-dark-500: #1a1a1b;
+  --color-dark-600: #121213;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  overscroll-behavior: none;
+}
+
+#root {
+  width: 100%;
+  min-height: 100svh;
+}
+
+.tile-flip {
+  animation: flip 0.5s ease-in-out forwards;
+}
+
+.tile-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.tile-bounce {
+  animation: bounceWin 0.1s ease-in-out forwards;
+}
+
+.tile-pop {
+  animation: pop 0.08s ease-in-out;
+}
+
+@keyframes flip {
+  0%   { transform: rotateX(0deg); }
+  45%  { transform: rotateX(-90deg); }
+  55%  { transform: rotateX(-90deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15%       { transform: translateX(-6px); }
+  35%       { transform: translateX(6px); }
+  55%       { transform: translateX(-4px); }
+  75%       { transform: translateX(4px); }
+  90%       { transform: translateX(-2px); }
+}
+
+@keyframes bounceWin {
+  0%   { transform: translateY(0); }
+  40%  { transform: translateY(-20px); }
+  60%  { transform: translateY(-20px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.toast-enter {
+  animation: fadeInDown 0.2s ease-out;
+}
