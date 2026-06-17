@@ -73,14 +73,14 @@ export default function Game() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-600 flex items-center justify-center">
+      <div className="h-dvh bg-dark-600 flex items-center justify-center">
         <div className="text-white text-2xl font-black tracking-widest animate-pulse">HENTLE</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-dark-600 flex flex-col items-center">
+    <div className="h-dvh bg-dark-600 flex flex-col items-center overflow-hidden">
       <Header
         onHelp={() => setShowHelp(true)}
         onShare={() => setShowResult(true)}
@@ -89,14 +89,14 @@ export default function Game() {
 
       <Toast message={toast} />
 
-      <Board
-        rows={rows}
-        shakeRow={shakeRow}
-        bounceRow={bounceRow}
-        revealingRow={revealingRow}
-      />
-
-      <div className="flex-1" />
+      <div className="flex-1 flex items-center justify-center min-h-0">
+        <Board
+          rows={rows}
+          shakeRow={shakeRow}
+          bounceRow={bounceRow}
+          revealingRow={revealingRow}
+        />
+      </div>
 
       <Keyboard
         keyStates={keyStates}
