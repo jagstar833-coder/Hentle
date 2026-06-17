@@ -80,7 +80,7 @@ export default function Game() {
   }
 
   return (
-    <div className="h-dvh bg-dark-600 flex flex-col items-center overflow-hidden">
+    <div className="min-h-dvh bg-dark-600 flex flex-col items-center overflow-x-hidden">
       <Header
         onHelp={() => setShowHelp(true)}
         onShare={() => setShowResult(true)}
