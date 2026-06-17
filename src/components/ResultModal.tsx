@@ -21,22 +21,6 @@ export default function ResultModal({ status, answer, rows, onClose }: ResultMod
   const completedRows = rows.filter(r => r.letters.some(l => l !== '') && r.states.some(s => s !== 'empty' && s !== 'filled'))
   const guessCount = status === 'won' ? completedRows.length : 'X'
 
-  const shareText = [
-    `Hentle ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${guessCount}/6`,
-    '',
-    ...completedRows.map(row =>
-      row.states.map(s => TILE_EMOJI[s]).join('')
-    ),
-  ].join('\n')
-
-  const handleShare = async () => {
-    try {
-      await navigator.clipboard.writeText(shareText)
-    } catch {
-      // fallback
-    }
-  }
-
   return (
     <div
       className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
