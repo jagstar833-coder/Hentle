@@ -8,33 +8,54 @@ import Toast from '../components/Toast'
 import HelpModal from '../components/HelpModal'
 import ResultModal from '../components/ResultModal'
 
+const WORD_CACHE_KEY = 'hentle-word-cache'
+const FETCH_TIMEOUT_MS = 3000
+
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
 }
 
+function getCachedWord(): string | null {
+  try {
+    const raw = localStorage.getItem(WORD_CACHE_KEY)
+    if (!raw) return null
+    const { date, word } = JSON.parse(raw)
+    return date === todayStr() ? word : null
+  } catch {
+    return null
+  }
+}
+
+function setCachedWord(word: string) {
+  localStorage.setItem(WORD_CACHE_KEY, JSON.stringify({ date: todayStr(), word }))
+}
+
 export default function Game() {
-  const [answer, setAnswer] = useState('')
-  const [loading, setLoading] = useState(true)
+  const cached = getCachedWord()
+  const [answer, setAnswer] = useState(cached ?? '')
+  const [loading, setLoading] = useState(!cached)
   const [showHelp, setShowHelp] = useState(false)
   const [showResult, setShowResult] = useState(false)
 
   useEffect(() => {
-    async function fetchWord() {
-      try {
-        const { data } = await supabase
-          .from('daily_words')
-          .select('word')
-          .eq('date', todayStr())
-          .single()
+    if (cached) return // already have today's word
 
-        setAnswer(data?.word ?? getFallbackWord())
-      } catch {
-        setAnswer(getFallbackWord())
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchWord()
+    const timeout = new Promise<string>(resolve =>
+      setTimeout(() => resolve(getFallbackWord()), FETCH_TIMEOUT_MS)
+    )
+
+    const fetch = supabase
+      .from('daily_words')
+      .select('word')
+      .eq('date', todayStr())
+      .single()
+      .then(({ data }) => data?.word ?? getFallbackWord())
+
+    Promise.race([fetch, timeout]).then(word => {
+      setCachedWord(word)
+      setAnswer(word)
+      setLoading(false)
+    })
   }, [])
 
   const {
@@ -43,7 +64,6 @@ export default function Game() {
     addLetter, removeLetter, submitGuess,
   } = useWordle(answer)
 
-  // Auto-open result modal after game ends
   useEffect(() => {
     if (gameStatus !== 'playing') {
       const t = setTimeout(() => setShowResult(true), 2200)
