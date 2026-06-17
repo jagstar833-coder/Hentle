@@ -11,8 +11,8 @@ interface TileProps {
 }
 
 const stateColors: Record<TileState, string> = {
-  empty: 'bg-transparent border-2 border-dark-300',
-  filled: 'bg-transparent border-2 border-dark-100',
+  empty: 'bg-transparent border-2 border-dark-300 text-white',
+  filled: 'bg-transparent border-2 border-dark-100 text-white',
   correct: 'bg-[#538d4e] border-2 border-[#538d4e] text-white',
   present: 'bg-[#b59f3b] border-2 border-[#b59f3b] text-white',
   absent:  'bg-dark-300 border-2 border-dark-300 text-white',
@@ -40,7 +40,7 @@ export default function Tile({ letter, state, isRevealing, index, isShaking, isB
   return (
     <div
       className={`
-        w-14 h-14 flex items-center justify-center
+        w-16 h-16 flex items-center justify-center
         text-2xl font-bold uppercase
         select-none cursor-default
         ${colorClass} ${animClass}

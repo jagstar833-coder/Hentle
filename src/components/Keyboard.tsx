@@ -40,8 +40,8 @@ export default function Keyboard({ keyStates, onKey, onEnter, onDelete }: Keyboa
                 key={key}
                 onClick={() => handleClick(key)}
                 className={`
-                  ${isWide ? 'px-3 text-xs min-w-[56px]' : 'w-[42px]'}
-                  h-14 rounded font-bold text-sm uppercase
+                  ${isWide ? 'px-3 text-xs min-w-[65px]' : 'w-[46px]'}
+                  h-16 rounded font-bold text-sm uppercase
                   transition-colors duration-150 select-none
                   active:scale-95 transition-transform
                   ${keyColor[state]}
