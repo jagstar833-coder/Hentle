@@ -16,7 +16,7 @@ function todayStr() {
 
 function getCachedWord(): string | null {
   try {
-    const raw = localStorage.getItem(WORD_CACHE_KEY)
+    const raw = sessionStorage.getItem(WORD_CACHE_KEY)
     if (!raw) return null
     const { date, word } = JSON.parse(raw)
     return date === todayStr() ? word : null
@@ -26,7 +26,7 @@ function getCachedWord(): string | null {
 }
 
 function setCachedWord(word: string) {
-  localStorage.setItem(WORD_CACHE_KEY, JSON.stringify({ date: todayStr(), word }))
+  sessionStorage.setItem(WORD_CACHE_KEY, JSON.stringify({ date: todayStr(), word }))
 }
 
 export default function Game() {
