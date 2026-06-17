@@ -9,7 +9,6 @@ import HelpModal from '../components/HelpModal'
 import ResultModal from '../components/ResultModal'
 
 const WORD_CACHE_KEY = 'hentle-word-cache'
-const FETCH_TIMEOUT_MS = 3000
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
@@ -40,22 +39,21 @@ export default function Game() {
   useEffect(() => {
     if (cached) return // already have today's word
 
-    const timeout = new Promise<string>(resolve =>
-      setTimeout(() => resolve(getFallbackWord()), FETCH_TIMEOUT_MS)
-    )
-
-    const fetch = supabase
+    supabase
       .from('daily_words')
       .select('word')
       .eq('date', todayStr())
       .single()
-      .then(({ data }) => data?.word ?? getFallbackWord())
-
-    Promise.race([fetch, timeout]).then(word => {
-      setCachedWord(word)
-      setAnswer(word)
-      setLoading(false)
-    })
+      .then(({ data }) => {
+        const word = data?.word ?? getFallbackWord()
+        setCachedWord(word)
+        setAnswer(word)
+        setLoading(false)
+      })
+      .catch(() => {
+        setAnswer(getFallbackWord())
+        setLoading(false)
+      })
   }, [])
 
   const {
