@@ -89,7 +89,7 @@ export default function Game() {
 
       <Toast message={toast} />
 
-      <div className="flex-1 flex items-center justify-center min-h-0">
+      <div className="flex-1 flex items-center justify-center py-2">
         <Board
           rows={rows}
           shakeRow={shakeRow}
