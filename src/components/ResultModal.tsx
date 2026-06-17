@@ -70,10 +70,10 @@ export default function ResultModal({ status, answer, rows, onClose }: ResultMod
         </div>
 
         <button
-          onClick={handleShare}
+          onClick={onClose}
           className="w-full bg-[#538d4e] hover:bg-[#6aaf63] text-white font-bold py-3 rounded-lg transition-colors tracking-wider"
         >
-          SHARE
+          OK
         </button>
 
         <p className="text-dark-100 text-xs mt-3">Come back tomorrow for a new word!</p>
