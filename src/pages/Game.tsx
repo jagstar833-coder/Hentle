@@ -37,23 +37,25 @@ export default function Game() {
   const [showResult, setShowResult] = useState(false)
 
   useEffect(() => {
-    if (cached) return // already have today's word
+    if (cached) return
 
-    supabase
-      .from('daily_words')
-      .select('word')
-      .eq('date', todayStr())
-      .single()
-      .then(({ data }) => {
+    async function fetchWord() {
+      try {
+        const { data } = await supabase
+          .from('daily_words')
+          .select('word')
+          .eq('date', todayStr())
+          .single()
         const word = data?.word ?? getFallbackWord()
         setCachedWord(word)
         setAnswer(word)
-        setLoading(false)
-      })
-      .catch(() => {
+      } catch {
         setAnswer(getFallbackWord())
+      } finally {
         setLoading(false)
-      })
+      }
+    }
+    fetchWord()
   }, [])
 
   const {
