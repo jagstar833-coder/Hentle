@@ -60,7 +60,7 @@ export default function Game() {
 
   const {
     rows, gameStatus, keyStates,
-    toast, shakeRow, bounceRow, revealingRow,
+    toast, shakeRow, bounceRow, revealingRow, checking,
     addLetter, removeLetter, submitGuess,
   } = useWordle(answer)
 
@@ -87,7 +87,7 @@ export default function Game() {
         gameOver={gameStatus !== 'playing'}
       />
 
-      <Toast message={toast} />
+      <Toast message={checking ? 'Checking…' : toast} />
 
       <Board
         rows={rows}
