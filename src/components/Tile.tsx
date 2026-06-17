@@ -40,8 +40,8 @@ export default function Tile({ letter, state, isRevealing, index, isShaking, isB
   return (
     <div
       className={`
-        w-[18vw] h-[18vw] max-w-24 max-h-24 flex items-center justify-center
-        text-[5vw] sm:text-3xl font-bold uppercase
+        w-[15vw] h-[15vw] max-w-24 max-h-24 flex items-center justify-center
+        text-[4vw] sm:text-3xl font-bold uppercase
         select-none cursor-default
         ${colorClass} ${animClass}
       `}
