@@ -14,6 +14,4 @@ jobs:
           WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           DATE=$(TZ='America/Chicago' date '+%B %-d, %Y')
-          curl -s -X POST "$WEBHOOK_URL" `
-            -H "Content-Type: application/json" `
-            -d "{\"embeds\":[{\"title\":\"🟩 Daily Hentle\",\"description\":\"**$DATE**\n\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n\nCan you guess todays word in 6 tries?\n\n[Play Hentle](https://hentle.mom)\",\"color\":5477454,\"footer\":{\"text\":\"hentle.mom\"}}]}"
+          curl -s -X POST "$WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"🟩 Daily Hentle\",\"description\":\"**$DATE**\n\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n\nCan you guess today's word in 6 tries?\n\n[Play Hentle](https://hentle.mom)\",\"color\":5477454,\"footer\":{\"text\":\"hentle.mom\"}}]}"
