@@ -5,8 +5,8 @@ import './index.css'
 import App from './App.tsx'
 import { initDiscord } from './lib/discord'
 
-async function bootstrap() {
-  await initDiscord()
+function bootstrap() {
+  initDiscord()
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
