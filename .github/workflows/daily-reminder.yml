@@ -9,32 +9,11 @@ jobs:
   post-reminder:
     runs-on: ubuntu-latest
     steps:
-      - name: Post Daily Hentle Reminder
+      - name: Send reminder
         env:
           WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           DATE=$(TZ='America/Chicago' date '+%B %-d, %Y')
-
-          DESCRIPTION="**${DATE}**
-
-⬛⬛⬛⬛⬛
-⬛⬛⬛⬛⬛
-⬛⬛⬛⬛⬛
-⬛⬛⬛⬛⬛
-⬛⬛⬛⬛⬛
-⬛⬛⬛⬛⬛
-
-Can you guess today's word in 6 tries?
-
-**[▶️ Play Hentle](https://hentle.mom)**"
-
-          jq -n \
-            --arg desc "$DESCRIPTION" \
-            '{
-              embeds: [{
-                title: "🟩 Daily Hentle",
-                description: $desc,
-                color: 5477454,
-                footer: {text: "hentle.mom • A new word every day"}
-              }]
-            }' | curl -s -H "Content-Type: application/json" -d @- "$WEBHOOK_URL"
+          curl -s -X POST "$WEBHOOK_URL" `
+            -H "Content-Type: application/json" `
+            -d "{\"embeds\":[{\"title\":\"🟩 Daily Hentle\",\"description\":\"**$DATE**\n\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n\nCan you guess todays word in 6 tries?\n\n[Play Hentle](https://hentle.mom)\",\"color\":5477454,\"footer\":{\"text\":\"hentle.mom\"}}]}"
