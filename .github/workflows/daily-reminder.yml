@@ -1,0 +1,40 @@
+name: Daily Hentle Reminder
+
+on:
+  schedule:
+    - cron: '30 12 * * *'  # 7:30 AM CDT (UTC-5)
+  workflow_dispatch:        # Allow manual trigger for testing
+
+jobs:
+  post-reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post Daily Hentle Reminder
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          DATE=$(TZ='America/Chicago' date '+%B %-d, %Y')
+
+          DESCRIPTION="**${DATE}**
+
+⬛⬛⬛⬛⬛
+⬛⬛⬛⬛⬛
+⬛⬛⬛⬛⬛
+⬛⬛⬛⬛⬛
+⬛⬛⬛⬛⬛
+⬛⬛⬛⬛⬛
+
+Can you guess today's word in 6 tries?
+
+**[▶️ Play Hentle](https://hentle.mom)**"
+
+          jq -n \
+            --arg desc "$DESCRIPTION" \
+            '{
+              embeds: [{
+                title: "🟩 Daily Hentle",
+                description: $desc,
+                color: 5477454,
+                footer: {text: "hentle.mom • A new word every day"}
+              }]
+            }' | curl -s -H "Content-Type: application/json" -d @- "$WEBHOOK_URL"
