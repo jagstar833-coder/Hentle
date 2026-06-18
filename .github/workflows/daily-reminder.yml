@@ -2,8 +2,8 @@ name: Daily Hentle Reminder
 
 on:
   schedule:
-    - cron: '30 12 * * *'  # 7:30 AM CDT (UTC-5)
-  workflow_dispatch:        # Allow manual trigger for testing
+    - cron: '30 12 * * *'
+  workflow_dispatch:
 
 jobs:
   post-reminder:
