@@ -37,14 +37,19 @@ async function postReminder(channelId: string) {
     year: 'numeric',
   })
 
-  const inviteRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/invites`, {
-    method: 'POST',
-    headers: { Authorization: `Bot ${BOT_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ max_age: 86400, max_uses: 0, target_type: 2, target_application_id: APP_ID }),
-  })
-  const invite = await inviteRes.json() as { code: string }
+  // Try to create an Activity invite; fall back to website URL if it fails
+  let playUrl = 'https://hentle.mom'
+  try {
+    const inviteRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/invites`, {
+      method: 'POST',
+      headers: { Authorization: `Bot ${BOT_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ max_age: 86400, max_uses: 0, target_type: 2, target_application_id: APP_ID }),
+    })
+    const invite = await inviteRes.json() as { code?: string }
+    if (invite.code) playUrl = `https://discord.gg/${invite.code}`
+  } catch { /* fall back to website */ }
 
-  await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+  const msgRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
     method: 'POST',
     headers: { Authorization: `Bot ${BOT_TOKEN}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -56,10 +61,15 @@ async function postReminder(channelId: string) {
       }],
       components: [{
         type: 1,
-        components: [{ type: 2, style: 5, label: '▶  Play Hentle', url: `https://discord.gg/${invite.code}` }],
+        components: [{ type: 2, style: 5, label: '▶  Play Hentle', url: playUrl }],
       }],
     }),
   })
+
+  if (!msgRes.ok) {
+    const err = await msgRes.json()
+    throw new Error(`Discord API error: ${JSON.stringify(err)}`)
+  }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -80,8 +90,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Slash command
   if (body.type === 2 && body.data?.name === 'remind') {
-    await postReminder(body.channel_id)
-    return res.json({ type: 4, data: { content: '✅ Reminder posted!', flags: 64 } })
+    try {
+      await postReminder(body.channel_id)
+      return res.json({ type: 4, data: { content: '✅ Reminder posted!', flags: 64 } })
+    } catch (e) {
+      return res.json({ type: 4, data: { content: `❌ Failed: ${(e as Error).message}`, flags: 64 } })
+    }
   }
 
   return res.status(400).json({ error: 'Unknown interaction' })
