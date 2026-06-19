@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { createVerify } from 'crypto'
+import { createVerify, createPublicKey } from 'crypto'
 
 export const config = { api: { bodyParser: false } }
 
@@ -19,9 +19,12 @@ function getRawBody(req: VercelRequest): Promise<string> {
 
 function verifySignature(sig: string, ts: string, body: string): boolean {
   try {
+    // Ed25519 raw public key must be wrapped in SPKI DER format for Node.js crypto
+    const spkiDer = Buffer.from('302a300506032b6570032100' + PUBLIC_KEY, 'hex')
+    const key = createPublicKey({ key: spkiDer, format: 'der', type: 'spki' })
     const v = createVerify('ed25519')
     v.update(ts + body)
-    return v.verify(Buffer.from(PUBLIC_KEY, 'hex'), Buffer.from(sig, 'hex'))
+    return v.verify(key, Buffer.from(sig, 'hex'))
   } catch {
     return false
   }
