@@ -13,6 +13,15 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+          APP_ID: "1517304672124403752"
         run: |
           DATE=$(TZ='America/Chicago' date '+%B %-d, %Y')
-          curl -s -X POST "https://discord.com/api/v10/channels/$CHANNEL_ID/messages" -H "Authorization: Bot $BOT_TOKEN" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"🟩 Daily Hentle\",\"description\":\"**$DATE**\n\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n\nCan you guess today's word in 6 tries?\",\"color\":5477454,\"footer\":{\"text\":\"hentle.mom\"}}],\"components\":[{\"type\":1,\"components\":[{\"type\":2,\"style\":5,\"label\":\"▶  Play Hentle\",\"url\":\"https://discord.com/activities/1517304672124403752\"}]}]}"
+          INVITE=$(curl -s -X POST "https://discord.com/api/v10/channels/$CHANNEL_ID/invites" \
+            -H "Authorization: Bot $BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"max_age\":86400,\"max_uses\":0,\"target_type\":2,\"target_application_id\":\"$APP_ID\"}" \
+            | jq -r '.code')
+          curl -s -X POST "https://discord.com/api/v10/channels/$CHANNEL_ID/messages" \
+            -H "Authorization: Bot $BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"embeds\":[{\"title\":\"🟩 Daily Hentle\",\"description\":\"**$DATE**\n\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n\nCan you guess today's word in 6 tries?\",\"color\":5477454,\"footer\":{\"text\":\"hentle.mom\"}}],\"components\":[{\"type\":1,\"components\":[{\"type\":2,\"style\":5,\"label\":\"▶  Play Hentle\",\"url\":\"https://discord.gg/$INVITE\"}]}]}"
