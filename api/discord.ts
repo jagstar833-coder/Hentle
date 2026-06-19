@@ -29,7 +29,7 @@ function verifySignature(sig: string, ts: string, body: string): boolean {
   }
 }
 
-async function postReminder() {
+async function postReminder(channelId: string) {
   const date = new Date().toLocaleDateString('en-US', {
     timeZone: 'America/Chicago',
     month: 'long',
@@ -37,14 +37,14 @@ async function postReminder() {
     year: 'numeric',
   })
 
-  const inviteRes = await fetch(`https://discord.com/api/v10/channels/${CHANNEL_ID}/invites`, {
+  const inviteRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/invites`, {
     method: 'POST',
     headers: { Authorization: `Bot ${BOT_TOKEN}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ max_age: 86400, max_uses: 0, target_type: 2, target_application_id: APP_ID }),
   })
   const invite = await inviteRes.json() as { code: string }
 
-  await fetch(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages`, {
+  await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
     method: 'POST',
     headers: { Authorization: `Bot ${BOT_TOKEN}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -80,7 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Slash command
   if (body.type === 2 && body.data?.name === 'remind') {
-    await postReminder()
+    await postReminder(body.channel_id)
     return res.json({ type: 4, data: { content: '✅ Reminder posted!', flags: 64 } })
   }
 
