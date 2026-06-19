@@ -61,17 +61,19 @@ function todayKey() {
 
 interface SavedState {
   date: string
+  word: string
   rows: GuessRow[]
   currentRow: number
   status: GameStatus
 }
 
-function loadSaved(): SavedState | null {
+function loadSaved(answer: string): SavedState | null {
   try {
     const raw = sessionStorage.getItem('hentle-state')
     if (!raw) return null
     const parsed = JSON.parse(raw) as SavedState
     if (parsed.date !== todayKey()) return null
+    if (answer && parsed.word !== answer) return null
     return parsed
   } catch {
     return null
@@ -79,7 +81,7 @@ function loadSaved(): SavedState | null {
 }
 
 export function useWordle(answer: string) {
-  const saved = loadSaved()
+  const saved = loadSaved(answer)
 
   const [rows, setRows] = useState<GuessRow[]>(saved?.rows ?? buildEmptyRows())
   const [currentRow, setCurrentRow] = useState(saved?.currentRow ?? 0)
@@ -225,6 +227,7 @@ export function useWordle(answer: string) {
     if (!answer) return
     const state: SavedState = {
       date: todayKey(),
+      word: answer,
       rows,
       currentRow,
       status: gameStatus,
