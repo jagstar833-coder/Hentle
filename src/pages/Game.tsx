@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useWordle, getFallbackWord } from '../hooks/useWordle'
+import { isDiscord } from '../lib/discord'
 import Board from '../components/Board'
 import Keyboard from '../components/Keyboard'
 import Header from '../components/Header'
@@ -41,12 +42,19 @@ export default function Game() {
 
     async function fetchWord() {
       try {
-        const { data } = await supabase
-          .from('daily_words')
-          .select('word')
-          .eq('date', todayStr())
-          .single()
-        const word = data?.word ?? getFallbackWord()
+        let word: string
+        if (isDiscord) {
+          const res = await fetch('/api/word')
+          const json = await res.json() as { word: string | null }
+          word = json.word ?? getFallbackWord()
+        } else {
+          const { data } = await supabase
+            .from('daily_words')
+            .select('word')
+            .eq('date', todayStr())
+            .single()
+          word = data?.word ?? getFallbackWord()
+        }
         setCachedWord(word)
         setAnswer(word)
       } catch {
