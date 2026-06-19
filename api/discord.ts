@@ -88,11 +88,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Discord PING handshake
   if (body.type === 1) return res.json({ type: 1 })
 
-  // Slash command
+  // /remind command
   if (body.type === 2 && body.data?.name === 'remind') {
     try {
       await postReminder(body.channel_id)
       return res.json({ type: 4, data: { content: '✅ Reminder posted!', flags: 64 } })
+    } catch (e) {
+      return res.json({ type: 4, data: { content: `❌ Failed: ${(e as Error).message}`, flags: 64 } })
+    }
+  }
+
+  // /setword command
+  if (body.type === 2 && body.data?.name === 'setword') {
+    const word = (body.data.options?.[0]?.value as string ?? '').toUpperCase().trim()
+    if (word.length !== 5 || !/^[A-Z]+$/.test(word)) {
+      return res.json({ type: 4, data: { content: '❌ Word must be exactly 5 letters.', flags: 64 } })
+    }
+    try {
+      const today = new Date().toISOString().slice(0, 10)
+      const sbRes = await fetch(
+        `${process.env.VITE_SUPABASE_URL}/rest/v1/daily_words`,
+        {
+          method: 'POST',
+          headers: {
+            apikey: process.env.VITE_SUPABASE_ANON_KEY!,
+            Authorization: `Bearer ${process.env.VITE_SUPABASE_ANON_KEY!}`,
+            'Content-Type': 'application/json',
+            Prefer: 'resolution=merge-duplicates',
+          },
+          body: JSON.stringify({ date: today, word }),
+        },
+      )
+      if (!sbRes.ok) {
+        const err = await sbRes.json()
+        throw new Error(JSON.stringify(err))
+      }
+      return res.json({ type: 4, data: { content: `✅ Today's word set to **${word}**`, flags: 64 } })
     } catch (e) {
       return res.json({ type: 4, data: { content: `❌ Failed: ${(e as Error).message}`, flags: 64 } })
     }
