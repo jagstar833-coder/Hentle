@@ -174,7 +174,7 @@ export function useWordle(answer: string) {
     const guess = rowsRef.current[currentRowRef.current].letters.join('').toLowerCase()
 
     setChecking(true)
-    const valid = await isValidWord(guess)
+    const valid = guess === answer.toLowerCase() || await isValidWord(guess)
     setChecking(false)
 
     if (!valid) {
