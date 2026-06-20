@@ -79,7 +79,9 @@ export default function Game() {
     }
   }, [gameStatus])
 
-  if (loading) {
+  const rowsReady = !answer || rows[0]?.letters.length === answer.length
+
+  if (loading || !rowsReady) {
     return (
       <div className="h-dvh bg-dark-600 flex items-center justify-center">
         <div className="text-white text-2xl font-black tracking-widest animate-pulse">HENTLE</div>

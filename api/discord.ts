@@ -37,6 +37,21 @@ async function postReminder(channelId: string) {
     year: 'numeric',
   })
 
+  // Fetch today's word to get the correct tile width for the grid
+  let wordLen = 5
+  try {
+    const today = new Date().toISOString().slice(0, 10)
+    const wRes = await fetch(
+      `${process.env.VITE_SUPABASE_URL}/rest/v1/daily_words?select=word&date=eq.${today}&limit=1`,
+      { headers: { apikey: process.env.VITE_SUPABASE_ANON_KEY!, Authorization: `Bearer ${process.env.VITE_SUPABASE_ANON_KEY!}` } },
+    )
+    const wData = await wRes.json() as Array<{ word: string }>
+    if (wData[0]?.word) wordLen = wData[0].word.length
+  } catch { /* fall back to 5 */ }
+
+  const gridRow = '⬛'.repeat(wordLen)
+  const grid = Array(6).fill(gridRow).join('\n')
+
   // Try to create an Activity invite; fall back to website URL if it fails
   let playUrl = 'https://hentle.mom'
   try {
@@ -55,7 +70,7 @@ async function postReminder(channelId: string) {
     body: JSON.stringify({
       embeds: [{
         title: '🟩 Daily Hentle',
-        description: `**${date}**\n\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n\nCan you guess today's word in 6 tries?`,
+        description: `**${date}**\n\n${grid}\n\nCan you guess today's ${wordLen}-letter word in 6 tries?`,
         color: 5477454,
         footer: { text: 'hentle.mom' },
       }],
@@ -101,8 +116,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // /setword command
   if (body.type === 2 && body.data?.name === 'setword') {
     const word = (body.data.options?.[0]?.value as string ?? '').toUpperCase().trim()
-    if (word.length !== 5 || !/^[A-Z]+$/.test(word)) {
-      return res.json({ type: 4, data: { content: '❌ Word must be exactly 5 letters.', flags: 64 } })
+    if (word.length < 3 || word.length > 10 || !/^[A-Z]+$/.test(word)) {
+      return res.json({ type: 4, data: { content: '❌ Word must be 3–10 letters with no spaces or numbers.', flags: 64 } })
     }
     try {
       const today = new Date().toISOString().slice(0, 10)

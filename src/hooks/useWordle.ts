@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import type { TileState, GameStatus, GuessRow } from '../types'
 import { ANSWER_WORDS } from '../utils/wordList'
 
-const WORD_LENGTH = 5
 const MAX_GUESSES = 6
 const REVEAL_DELAY = 300
 
@@ -23,11 +22,12 @@ async function isValidWord(word: string): Promise<boolean> {
 }
 
 function computeStates(guess: string, answer: string): TileState[] {
-  const states: TileState[] = Array(WORD_LENGTH).fill('absent')
+  const len = guess.length
+  const states: TileState[] = Array(len).fill('absent')
   const answerArr = answer.split('')
   const guessArr = guess.split('')
 
-  for (let i = 0; i < WORD_LENGTH; i++) {
+  for (let i = 0; i < len; i++) {
     if (guessArr[i] === answerArr[i]) {
       states[i] = 'correct'
       answerArr[i] = '#'
@@ -35,7 +35,7 @@ function computeStates(guess: string, answer: string): TileState[] {
     }
   }
 
-  for (let i = 0; i < WORD_LENGTH; i++) {
+  for (let i = 0; i < len; i++) {
     if (guessArr[i] === '*') continue
     const idx = answerArr.indexOf(guessArr[i])
     if (idx !== -1) {
@@ -47,10 +47,10 @@ function computeStates(guess: string, answer: string): TileState[] {
   return states
 }
 
-function buildEmptyRows(): GuessRow[] {
+function buildEmptyRows(wordLength: number): GuessRow[] {
   return Array(MAX_GUESSES).fill(null).map(() => ({
-    letters: Array(WORD_LENGTH).fill(''),
-    states: Array(WORD_LENGTH).fill('empty') as TileState[],
+    letters: Array(wordLength).fill(''),
+    states: Array(wordLength).fill('empty') as TileState[],
     isRevealing: false,
   }))
 }
@@ -81,9 +81,10 @@ function loadSaved(answer: string): SavedState | null {
 }
 
 export function useWordle(answer: string) {
+  const wordLength = answer.length || 5
   const saved = loadSaved(answer)
 
-  const [rows, setRows] = useState<GuessRow[]>(saved?.rows ?? buildEmptyRows())
+  const [rows, setRows] = useState<GuessRow[]>(saved?.rows ?? buildEmptyRows(wordLength))
   const [currentRow, setCurrentRow] = useState(saved?.currentRow ?? 0)
   const [currentCol, setCurrentCol] = useState(0)
   const [gameStatus, setGameStatus] = useState<GameStatus>(saved?.status ?? 'playing')
@@ -97,9 +98,20 @@ export function useWordle(answer: string) {
   const rowsRef = useRef(rows)
   const currentRowRef = useRef(currentRow)
   const currentColRef = useRef(currentCol)
+  const answerRef = useRef(answer)
   useEffect(() => { rowsRef.current = rows }, [rows])
   useEffect(() => { currentRowRef.current = currentRow }, [currentRow])
   useEffect(() => { currentColRef.current = currentCol }, [currentCol])
+  useEffect(() => { answerRef.current = answer }, [answer])
+
+  // Reset rows when word length changes (e.g. switching from 5-letter to 6-letter day)
+  useEffect(() => {
+    if (!answer) return
+    setRows(prev => {
+      if ((prev[0]?.letters.length ?? 0) === answer.length) return prev
+      return buildEmptyRows(answer.length)
+    })
+  }, [answer])
 
   const keyStates = (() => {
     const map: Record<string, TileState> = {}
@@ -124,7 +136,7 @@ export function useWordle(answer: string) {
   const addLetter = useCallback((letter: string) => {
     if (gameStatus !== 'playing') return
     if (revealingRow !== null || checking) return
-    if (currentColRef.current >= WORD_LENGTH) return
+    if (currentColRef.current >= answerRef.current.length) return
 
     setRows(prev => {
       const next = prev.map(r => ({ ...r, letters: [...r.letters], states: [...r.states] }))
@@ -152,7 +164,7 @@ export function useWordle(answer: string) {
   const submitGuess = useCallback(async () => {
     if (gameStatus !== 'playing') return
     if (revealingRow !== null || checking) return
-    if (currentColRef.current < WORD_LENGTH) {
+    if (currentColRef.current < answer.length) {
       showToast('Not enough letters')
       setShakeRow(currentRowRef.current)
       setTimeout(() => setShakeRow(null), 600)
@@ -207,7 +219,7 @@ export function useWordle(answer: string) {
         setCurrentRow(nextRow)
         setCurrentCol(0)
       }
-    }, WORD_LENGTH * REVEAL_DELAY + 100)
+    }, answer.length * REVEAL_DELAY + 100)
   }, [gameStatus, revealingRow, checking, answer, showToast])
 
   // Keyboard handler
@@ -251,7 +263,7 @@ export function useWordle(answer: string) {
   }
 }
 
-export { WORD_LENGTH, MAX_GUESSES, REVEAL_DELAY }
+export { MAX_GUESSES, REVEAL_DELAY }
 
 export function getFallbackWord(): string {
   return ANSWER_WORDS[Math.floor(Math.random() * ANSWER_WORDS.length)]

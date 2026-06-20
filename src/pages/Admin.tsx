@@ -67,8 +67,8 @@ export default function Admin() {
   async function handleSaveWord(e: React.FormEvent) {
     e.preventDefault()
     const word = newWord.trim().toLowerCase()
-    if (word.length !== 5) {
-      setSaveMsg('Word must be exactly 5 letters.')
+    if (word.length < 3 || word.length > 10) {
+      setSaveMsg('Word must be 3–10 letters.')
       return
     }
     if (!/^[a-z]+$/.test(word)) {
@@ -178,15 +178,21 @@ export default function Admin() {
           <form onSubmit={handleSaveWord} className="space-y-4">
             <div className="flex gap-3">
               <div className="flex-1">
-                <label className="text-dark-100 text-xs font-bold uppercase tracking-wider block mb-1">Word</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-dark-100 text-xs font-bold uppercase tracking-wider">Word</label>
+                  {newWord.length > 0 && (
+                    <span className="text-xs font-bold text-[#538d4e]">{newWord.length} letters</span>
+                  )}
+                </div>
                 <input
                   type="text"
                   value={newWord}
-                  onChange={e => setNewWord(e.target.value.toUpperCase().slice(0, 5))}
+                  onChange={e => setNewWord(e.target.value.toUpperCase().slice(0, 10))}
                   placeholder="APPLE"
-                  maxLength={5}
+                  maxLength={10}
                   className="w-full bg-dark-400 border border-dark-300 text-white rounded-lg px-3 py-2.5 font-mono text-lg tracking-widest uppercase focus:outline-none focus:border-[#538d4e] placeholder:text-dark-200"
                 />
+                <p className="text-dark-200 text-xs mt-1">Any length 3–10 letters</p>
               </div>
               <div>
                 <label className="text-dark-100 text-xs font-bold uppercase tracking-wider block mb-1">Date</label>
@@ -207,7 +213,7 @@ export default function Admin() {
 
             <button
               type="submit"
-              disabled={saving || newWord.length !== 5}
+              disabled={saving || newWord.length < 3}
               className="bg-[#538d4e] hover:bg-[#6aaf63] disabled:opacity-40 text-white font-bold px-6 py-2.5 rounded-lg transition-colors"
             >
               {saving ? 'Saving…' : 'Save Word'}
@@ -239,6 +245,7 @@ export default function Admin() {
                       <span className={`font-mono font-black text-lg tracking-widest ${isPast && !isToday ? 'text-dark-100' : 'text-white'}`}>
                         {w.word.toUpperCase()}
                       </span>
+                      <span className="text-dark-200 text-xs">{w.word.length}L</span>
                       <span className="text-dark-100 text-sm">{w.date}</span>
                       {isToday && (
                         <span className="text-xs bg-[#538d4e] text-white px-2 py-0.5 rounded font-bold">TODAY</span>

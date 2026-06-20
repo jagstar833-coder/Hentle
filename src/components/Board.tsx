@@ -1,6 +1,5 @@
 import type { GuessRow } from '../types'
 import Tile from './Tile'
-import { WORD_LENGTH } from '../hooks/useWordle'
 
 interface BoardProps {
   rows: GuessRow[]
@@ -14,7 +13,7 @@ export default function Board({ rows, shakeRow, bounceRow, revealingRow }: Board
     <div className="flex flex-col gap-1 sm:gap-1.5 my-2 sm:my-4">
       {rows.map((row, rowIdx) => (
         <div key={rowIdx} className="flex gap-1 sm:gap-1.5">
-          {Array(WORD_LENGTH).fill(null).map((_, colIdx) => (
+          {row.letters.map((_, colIdx) => (
             <Tile
               key={colIdx}
               letter={row.letters[colIdx]}
