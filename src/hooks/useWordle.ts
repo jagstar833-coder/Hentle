@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { TileState, GameStatus, GuessRow } from '../types'
 import { ANSWER_WORDS } from '../utils/wordList'
+import { isDiscord } from '../lib/discord'
 
 const MAX_GUESSES = 6
 const REVEAL_DELAY = 300
@@ -11,12 +12,20 @@ const wordCache = new Map<string, boolean>()
 async function isValidWord(word: string): Promise<boolean> {
   if (wordCache.has(word)) return wordCache.get(word)!
   try {
-    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
-    const valid = res.ok
+    const url = isDiscord
+      ? `/api/validate?word=${encodeURIComponent(word)}`
+      : `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+    const res = await fetch(url)
+    let valid: boolean
+    if (isDiscord) {
+      const json = await res.json() as { valid: boolean }
+      valid = json.valid
+    } else {
+      valid = res.ok
+    }
     wordCache.set(word, valid)
     return valid
   } catch {
-    // If the API is unreachable, let the word through
     return true
   }
 }
