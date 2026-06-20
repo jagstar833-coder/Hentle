@@ -9,6 +9,9 @@ interface BoardProps {
 }
 
 export default function Board({ rows, shakeRow, bounceRow, revealingRow }: BoardProps) {
+  const wordLength = rows[0]?.letters.length || 5
+  const tileVw = Math.min(15, Math.floor(85 / wordLength))
+
   return (
     <div className="flex flex-col gap-1 sm:gap-1.5 my-2 sm:my-4">
       {rows.map((row, rowIdx) => (
@@ -22,6 +25,7 @@ export default function Board({ rows, shakeRow, bounceRow, revealingRow }: Board
               index={colIdx}
               isShaking={shakeRow === rowIdx}
               isBouncing={bounceRow === rowIdx}
+              tileVw={tileVw}
             />
           ))}
         </div>

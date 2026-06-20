@@ -8,6 +8,7 @@ interface TileProps {
   index: number
   isShaking: boolean
   isBouncing: boolean
+  tileVw: number
 }
 
 const stateColors: Record<TileState, string> = {
@@ -18,7 +19,7 @@ const stateColors: Record<TileState, string> = {
   absent:  'bg-dark-300 border-2 border-dark-300 text-white',
 }
 
-export default function Tile({ letter, state, isRevealing, index, isShaking, isBouncing }: TileProps) {
+export default function Tile({ letter, state, isRevealing, index, isShaking, isBouncing, tileVw }: TileProps) {
   const delay = isRevealing ? `${index * REVEAL_DELAY}ms` : '0ms'
 
   const animClass = isShaking
@@ -40,12 +41,15 @@ export default function Tile({ letter, state, isRevealing, index, isShaking, isB
   return (
     <div
       className={`
-        w-[15vw] h-[15vw] max-w-24 max-h-24 flex items-center justify-center
-        text-[4vw] sm:text-3xl font-bold uppercase
+        max-w-24 max-h-24 flex items-center justify-center
+        sm:text-3xl font-bold uppercase
         select-none cursor-default
         ${colorClass} ${animClass}
       `}
       style={{
+        width: `${tileVw}vw`,
+        height: `${tileVw}vw`,
+        fontSize: `${Math.min(4, tileVw * 0.45)}vw`,
         animationDelay: delay,
         perspective: '250px',
       }}
